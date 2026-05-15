@@ -9,18 +9,24 @@
   <body>
     <header class="topbar">
       <div>
-        <p class="eyebrow">Residency Decision Intelligence Simulator</p>
+        <p class="eyebrow">Decision Intelligence Residency</p>
         <h1>Strategic Decision Lab</h1>
+        <p class="subtitle">An executive-style simulator for turning analytics into boardroom-ready action.</p>
       </div>
-      <button id="resetButton" class="icon-button" type="button" aria-label="Reset simulator">
-        <span aria-hidden="true">Reset</span>
-      </button>
+      <div class="header-actions">
+        <button id="resetButton" class="ghost-button" type="button">Reset</button>
+        <button id="copyButton" class="primary-button" type="button">Copy brief</button>
+      </div>
     </header>
 
     <main class="app-shell">
-      <section class="workspace" aria-label="Decision simulator controls">
-        <div class="panel scenario-panel">
-          <label for="scenarioSelect">Scenario</label>
+      <aside class="workspace" aria-label="Decision simulator controls">
+        <section class="panel scenario-panel">
+          <div class="section-heading">
+            <p class="eyebrow">Case file</p>
+            <span id="caseCode" class="status-pill"></span>
+          </div>
+          <label for="scenarioSelect">Business scenario</label>
           <select id="scenarioSelect">
             <option value="healthcare">Healthcare capacity</option>
             <option value="retail">Retail inventory</option>
@@ -29,12 +35,31 @@
             <option value="supply">Supply chain resilience</option>
           </select>
           <p id="scenarioBrief" class="brief"></p>
-        </div>
+          <dl class="case-details">
+            <div>
+              <dt>Decision owner</dt>
+              <dd id="decisionOwner"></dd>
+            </div>
+            <div>
+              <dt>Planning horizon</dt>
+              <dd id="planningHorizon"></dd>
+            </div>
+            <div>
+              <dt>Baseline exposure</dt>
+              <dd id="baselineExposure"></dd>
+            </div>
+          </dl>
+        </section>
 
-        <div class="panel controls-panel">
+        <section class="panel controls-panel">
+          <div class="section-heading">
+            <p class="eyebrow">Assumptions</p>
+            <span class="status-pill">Live model</span>
+          </div>
+
           <div class="control-row">
             <div>
-              <label for="budget">Budget intensity</label>
+              <label for="budget">Investment level</label>
               <span id="budgetValue" class="value-pill"></span>
             </div>
             <input id="budget" type="range" min="0" max="100" value="55" />
@@ -63,59 +88,92 @@
             </div>
             <input id="risk" type="range" min="0" max="100" value="48" />
           </div>
-        </div>
-      </section>
+        </section>
+      </aside>
 
       <section class="dashboard" aria-label="Decision outcome dashboard">
-        <div class="kpi-grid">
+        <section class="scoreboard">
           <article class="kpi-card">
-            <span>Expected value</span>
+            <span>Net value impact</span>
             <strong id="valueScore"></strong>
-            <meter id="valueMeter" min="0" max="100"></meter>
+            <small id="valueDetail"></small>
           </article>
           <article class="kpi-card">
             <span>Execution risk</span>
             <strong id="riskScore"></strong>
-            <meter id="riskMeter" min="0" max="100"></meter>
+            <small id="riskDetail"></small>
           </article>
           <article class="kpi-card">
-            <span>Stakeholder impact</span>
+            <span>Service impact</span>
             <strong id="impactScore"></strong>
-            <meter id="impactMeter" min="0" max="100"></meter>
+            <small id="impactDetail"></small>
           </article>
           <article class="kpi-card">
             <span>Decision confidence</span>
             <strong id="confidenceScore"></strong>
-            <meter id="confidenceMeter" min="0" max="100"></meter>
+            <small id="confidenceDetail"></small>
           </article>
-        </div>
+        </section>
 
-        <div class="decision-layout">
-          <article class="panel recommendation">
+        <section class="decision-hero">
+          <article class="recommendation">
             <p class="eyebrow">Recommended move</p>
             <h2 id="recommendationTitle"></h2>
             <p id="recommendationText"></p>
+            <div class="recommendation-meta">
+              <span id="decisionStage"></span>
+              <span id="governanceLevel"></span>
+            </div>
           </article>
 
           <article class="panel">
-            <p class="eyebrow">Tradeoff map</p>
+            <div class="section-heading">
+              <p class="eyebrow">Decision frontier</p>
+              <span class="status-pill">Value vs risk</span>
+            </div>
             <div class="matrix" aria-label="Decision tradeoff matrix">
-              <div class="quadrant muted">Monitor</div>
-              <div class="quadrant caution">Constrain</div>
+              <div class="quadrant muted">Observe</div>
+              <div class="quadrant caution">Control</div>
               <div class="quadrant good">Scale</div>
               <div class="quadrant bold">Transform</div>
               <span id="decisionDot" class="decision-dot" aria-hidden="true"></span>
             </div>
           </article>
-        </div>
+        </section>
 
-        <article class="panel brief-panel">
-          <div class="brief-header">
+        <section class="insight-grid">
+          <article class="panel">
+            <div class="section-heading">
+              <p class="eyebrow">Risk drivers</p>
+              <span id="riskBadge" class="status-pill"></span>
+            </div>
+            <div id="riskDrivers" class="driver-list"></div>
+          </article>
+
+          <article class="panel">
+            <div class="section-heading">
+              <p class="eyebrow">Sensitivity</p>
+              <span class="status-pill">What matters most</span>
+            </div>
+            <div id="sensitivityList" class="sensitivity-list"></div>
+          </article>
+        </section>
+
+        <section class="panel action-panel">
+          <div class="section-heading">
+            <p class="eyebrow">90-day action plan</p>
+            <span id="actionCadence" class="status-pill"></span>
+          </div>
+          <div id="actionPlan" class="action-list"></div>
+        </section>
+
+        <section class="panel brief-panel">
+          <div class="section-heading">
             <p class="eyebrow">Executive decision brief</p>
-            <button id="copyButton" type="button">Copy brief</button>
+            <span class="status-pill">Presentation ready</span>
           </div>
           <pre id="decisionBrief"></pre>
-        </article>
+        </section>
       </section>
     </main>
 

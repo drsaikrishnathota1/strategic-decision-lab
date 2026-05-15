@@ -7,6 +7,7 @@ const js = await readFile(new URL("../app.js", import.meta.url), "utf8");
 
 for (const id of [
   "scenarioSelect",
+  "caseCode",
   "budget",
   "demand",
   "operations",
@@ -15,16 +16,21 @@ for (const id of [
   "riskScore",
   "impactScore",
   "confidenceScore",
+  "riskDrivers",
+  "sensitivityList",
+  "actionPlan",
   "decisionBrief",
 ]) {
   assert(html.includes(`id="${id}"`), `Expected #${id} in index.html`);
 }
 
 assert(html.includes("Strategic Decision Lab"), "Expected app title");
-assert(css.includes("@media (max-width: 920px)"), "Expected responsive tablet layout");
+assert(css.includes("@media (max-width: 1060px)"), "Expected responsive tablet layout");
 assert(css.includes("@media (max-width: 560px)"), "Expected responsive phone layout");
 assert(js.includes("const scenarios"), "Expected scenario model");
 assert(js.includes("function score"), "Expected scoring function");
+assert(js.includes("function riskDrivers"), "Expected risk driver model");
+assert(js.includes("function sensitivity"), "Expected sensitivity model");
 assert(js.includes("navigator.clipboard.writeText"), "Expected copy brief action");
 
 console.log("Smoke test passed: app shell, responsive CSS, and simulator logic are present.");
