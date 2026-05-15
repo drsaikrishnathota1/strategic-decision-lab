@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Strategic Decision Lab</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">Residency Decision Intelligence Simulator</p>
+        <h1>Strategic Decision Lab</h1>
+      </div>
+      <button id="resetButton" class="icon-button" type="button" aria-label="Reset simulator">
+        <span aria-hidden="true">Reset</span>
+      </button>
+    </header>
+
+    <main class="app-shell">
+      <section class="workspace" aria-label="Decision simulator controls">
+        <div class="panel scenario-panel">
+          <label for="scenarioSelect">Scenario</label>
+          <select id="scenarioSelect">
+            <option value="healthcare">Healthcare capacity</option>
+            <option value="retail">Retail inventory</option>
+            <option value="education">Student enrollment</option>
+            <option value="finance">Fraud response</option>
+            <option value="supply">Supply chain resilience</option>
+          </select>
+          <p id="scenarioBrief" class="brief"></p>
+        </div>
+
+        <div class="panel controls-panel">
+          <div class="control-row">
+            <div>
+              <label for="budget">Budget intensity</label>
+              <span id="budgetValue" class="value-pill"></span>
+            </div>
+            <input id="budget" type="range" min="0" max="100" value="55" />
+          </div>
+
+          <div class="control-row">
+            <div>
+              <label for="demand">Demand pressure</label>
+              <span id="demandValue" class="value-pill"></span>
+            </div>
+            <input id="demand" type="range" min="0" max="100" value="62" />
+          </div>
+
+          <div class="control-row">
+            <div>
+              <label for="operations">Operational readiness</label>
+              <span id="operationsValue" class="value-pill"></span>
+            </div>
+            <input id="operations" type="range" min="0" max="100" value="58" />
+          </div>
+
+          <div class="control-row">
+            <div>
+              <label for="risk">Risk tolerance</label>
+              <span id="riskValue" class="value-pill"></span>
+            </div>
+            <input id="risk" type="range" min="0" max="100" value="48" />
+          </div>
+        </div>
+      </section>
+
+      <section class="dashboard" aria-label="Decision outcome dashboard">
+        <div class="kpi-grid">
+          <article class="kpi-card">
+            <span>Expected value</span>
+            <strong id="valueScore"></strong>
+            <meter id="valueMeter" min="0" max="100"></meter>
+          </article>
+          <article class="kpi-card">
+            <span>Execution risk</span>
+            <strong id="riskScore"></strong>
+            <meter id="riskMeter" min="0" max="100"></meter>
+          </article>
+          <article class="kpi-card">
+            <span>Stakeholder impact</span>
+            <strong id="impactScore"></strong>
+            <meter id="impactMeter" min="0" max="100"></meter>
+          </article>
+          <article class="kpi-card">
+            <span>Decision confidence</span>
+            <strong id="confidenceScore"></strong>
+            <meter id="confidenceMeter" min="0" max="100"></meter>
+          </article>
+        </div>
+
+        <div class="decision-layout">
+          <article class="panel recommendation">
+            <p class="eyebrow">Recommended move</p>
+            <h2 id="recommendationTitle"></h2>
+            <p id="recommendationText"></p>
+          </article>
+
+          <article class="panel">
+            <p class="eyebrow">Tradeoff map</p>
+            <div class="matrix" aria-label="Decision tradeoff matrix">
+              <div class="quadrant muted">Monitor</div>
+              <div class="quadrant caution">Constrain</div>
+              <div class="quadrant good">Scale</div>
+              <div class="quadrant bold">Transform</div>
+              <span id="decisionDot" class="decision-dot" aria-hidden="true"></span>
+            </div>
+          </article>
+        </div>
+
+        <article class="panel brief-panel">
+          <div class="brief-header">
+            <p class="eyebrow">Executive decision brief</p>
+            <button id="copyButton" type="button">Copy brief</button>
+          </div>
+          <pre id="decisionBrief"></pre>
+        </article>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
