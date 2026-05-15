@@ -7,172 +7,109 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <header class="topbar">
-      <div>
-        <p class="eyebrow">Decision Intelligence Residency</p>
-        <h1>Strategic Decision Lab</h1>
-        <p class="subtitle">An executive-style simulator for turning analytics into boardroom-ready action.</p>
-      </div>
-      <div class="header-actions">
-        <button id="resetButton" class="ghost-button" type="button">Reset</button>
-        <button id="copyButton" class="primary-button" type="button">Copy brief</button>
-      </div>
-    </header>
+    <main class="command-center">
+      <section class="stage" aria-label="Strategic Decision Lab cockpit">
+        <canvas id="decisionCanvas" aria-label="3D decision simulation view"></canvas>
 
-    <main class="app-shell">
-      <aside class="workspace" aria-label="Decision simulator controls">
-        <section class="panel scenario-panel">
-          <div class="section-heading">
-            <p class="eyebrow">Case file</p>
-            <span id="caseCode" class="status-pill"></span>
+        <header class="glass topbar">
+          <div>
+            <p class="eyebrow">Decision Intelligence</p>
+            <h1>Strategic Decision Lab</h1>
           </div>
-          <label for="scenarioSelect">Business scenario</label>
-          <select id="scenarioSelect">
-            <option value="healthcare">Healthcare capacity</option>
-            <option value="retail">Retail inventory</option>
-            <option value="education">Student enrollment</option>
-            <option value="finance">Fraud response</option>
-            <option value="supply">Supply chain resilience</option>
-          </select>
-          <p id="scenarioBrief" class="brief"></p>
-          <dl class="case-details">
-            <div>
-              <dt>Decision owner</dt>
-              <dd id="decisionOwner"></dd>
-            </div>
-            <div>
-              <dt>Planning horizon</dt>
-              <dd id="planningHorizon"></dd>
-            </div>
-            <div>
-              <dt>Baseline exposure</dt>
-              <dd id="baselineExposure"></dd>
-            </div>
-          </dl>
-        </section>
+          <div class="top-actions" aria-label="Primary actions">
+            <button id="simulateButton" class="action-button active" type="button">Run</button>
+            <button id="optimizeButton" class="action-button" type="button">Optimize</button>
+            <button id="compareButton" class="action-button" type="button">Compare</button>
+            <button id="copyButton" class="action-button" type="button">Brief</button>
+            <button id="resetButton" class="action-button muted-button" type="button">Reset</button>
+          </div>
+        </header>
 
-        <section class="panel controls-panel">
-          <div class="section-heading">
-            <p class="eyebrow">Assumptions</p>
-            <span class="status-pill">Live model</span>
+        <aside class="glass control-rail">
+          <div class="rail-head">
+            <span id="caseCode" class="status-chip"></span>
+            <select id="scenarioSelect" aria-label="Business scenario">
+              <option value="healthcare">Healthcare</option>
+              <option value="retail">Retail</option>
+              <option value="education">Education</option>
+              <option value="finance">Finance</option>
+              <option value="supply">Supply Chain</option>
+            </select>
           </div>
 
-          <div class="control-row">
-            <div>
-              <label for="budget">Investment level</label>
-              <span id="budgetValue" class="value-pill"></span>
-            </div>
-            <input id="budget" type="range" min="0" max="100" value="55" />
-          </div>
+          <div class="control-grid">
+            <label class="control-tile" for="budget">
+              <span>Invest</span>
+              <strong id="budgetValue"></strong>
+              <input id="budget" type="range" min="0" max="100" value="55" />
+            </label>
 
-          <div class="control-row">
-            <div>
-              <label for="demand">Demand pressure</label>
-              <span id="demandValue" class="value-pill"></span>
-            </div>
-            <input id="demand" type="range" min="0" max="100" value="62" />
-          </div>
+            <label class="control-tile" for="demand">
+              <span>Demand</span>
+              <strong id="demandValue"></strong>
+              <input id="demand" type="range" min="0" max="100" value="62" />
+            </label>
 
-          <div class="control-row">
-            <div>
-              <label for="operations">Operational readiness</label>
-              <span id="operationsValue" class="value-pill"></span>
-            </div>
-            <input id="operations" type="range" min="0" max="100" value="58" />
-          </div>
+            <label class="control-tile" for="operations">
+              <span>Ready</span>
+              <strong id="operationsValue"></strong>
+              <input id="operations" type="range" min="0" max="100" value="58" />
+            </label>
 
-          <div class="control-row">
-            <div>
-              <label for="risk">Risk tolerance</label>
-              <span id="riskValue" class="value-pill"></span>
-            </div>
-            <input id="risk" type="range" min="0" max="100" value="48" />
+            <label class="control-tile" for="risk">
+              <span>Risk</span>
+              <strong id="riskValue"></strong>
+              <input id="risk" type="range" min="0" max="100" value="48" />
+            </label>
           </div>
-        </section>
-      </aside>
+        </aside>
 
-      <section class="dashboard" aria-label="Decision outcome dashboard">
-        <section class="scoreboard">
-          <article class="kpi-card">
-            <span>Net value impact</span>
+        <section class="glass score-strip" aria-label="Decision metrics">
+          <article>
+            <span>Value</span>
             <strong id="valueScore"></strong>
             <small id="valueDetail"></small>
           </article>
-          <article class="kpi-card">
-            <span>Execution risk</span>
+          <article>
+            <span>Risk</span>
             <strong id="riskScore"></strong>
             <small id="riskDetail"></small>
           </article>
-          <article class="kpi-card">
-            <span>Service impact</span>
+          <article>
+            <span>Impact</span>
             <strong id="impactScore"></strong>
             <small id="impactDetail"></small>
           </article>
-          <article class="kpi-card">
-            <span>Decision confidence</span>
+          <article>
+            <span>Confidence</span>
             <strong id="confidenceScore"></strong>
             <small id="confidenceDetail"></small>
           </article>
         </section>
 
-        <section class="decision-hero">
-          <article class="recommendation">
-            <p class="eyebrow">Recommended move</p>
-            <h2 id="recommendationTitle"></h2>
-            <p id="recommendationText"></p>
-            <div class="recommendation-meta">
-              <span id="decisionStage"></span>
-              <span id="governanceLevel"></span>
-            </div>
-          </article>
-
-          <article class="panel">
-            <div class="section-heading">
-              <p class="eyebrow">Decision frontier</p>
-              <span class="status-pill">Value vs risk</span>
-            </div>
-            <div class="matrix" aria-label="Decision tradeoff matrix">
-              <div class="quadrant muted">Observe</div>
-              <div class="quadrant caution">Control</div>
-              <div class="quadrant good">Scale</div>
-              <div class="quadrant bold">Transform</div>
-              <span id="decisionDot" class="decision-dot" aria-hidden="true"></span>
-            </div>
-          </article>
-        </section>
-
-        <section class="insight-grid">
-          <article class="panel">
-            <div class="section-heading">
-              <p class="eyebrow">Risk drivers</p>
-              <span id="riskBadge" class="status-pill"></span>
-            </div>
-            <div id="riskDrivers" class="driver-list"></div>
-          </article>
-
-          <article class="panel">
-            <div class="section-heading">
-              <p class="eyebrow">Sensitivity</p>
-              <span class="status-pill">What matters most</span>
-            </div>
-            <div id="sensitivityList" class="sensitivity-list"></div>
-          </article>
-        </section>
-
-        <section class="panel action-panel">
-          <div class="section-heading">
-            <p class="eyebrow">90-day action plan</p>
-            <span id="actionCadence" class="status-pill"></span>
+        <section class="glass decision-card" aria-label="Recommendation">
+          <div class="decision-status">
+            <span id="decisionStage"></span>
+            <span id="governanceLevel"></span>
           </div>
-          <div id="actionPlan" class="action-list"></div>
+          <h2 id="recommendationTitle"></h2>
+          <p id="recommendationText"></p>
         </section>
 
-        <section class="panel brief-panel">
-          <div class="section-heading">
-            <p class="eyebrow">Executive decision brief</p>
-            <span class="status-pill">Presentation ready</span>
+        <section class="glass insight-dock" aria-label="Decision tools">
+          <button class="dock-button selected" type="button" data-view="drivers">Drivers</button>
+          <button class="dock-button" type="button" data-view="sensitivity">Sensitivity</button>
+          <button class="dock-button" type="button" data-view="actions">Actions</button>
+          <button class="dock-button" type="button" data-view="brief">Brief</button>
+        </section>
+
+        <section class="glass drawer" aria-live="polite">
+          <div class="drawer-head">
+            <p id="drawerTitle" class="eyebrow"></p>
+            <span id="riskBadge" class="status-chip"></span>
           </div>
-          <pre id="decisionBrief"></pre>
+          <div id="drawerContent" class="drawer-content"></div>
+          <pre id="decisionBrief" class="sr-brief"></pre>
         </section>
       </section>
     </main>

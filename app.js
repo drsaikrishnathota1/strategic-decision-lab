@@ -1,106 +1,96 @@
 const scenarios = {
   healthcare: {
-    label: "Healthcare capacity",
+    label: "Healthcare",
     code: "HC-204",
-    owner: "Chief Operating Officer",
-    horizon: "2 quarters",
-    exposure: "$4.8M access gap",
-    brief:
-      "A regional clinic network is seeing rising demand, longer appointment wait times, and uneven staffing utilization across sites.",
-    decision: "Expand clinical capacity with phased staffing and scheduling redesign",
+    owner: "COO",
+    horizon: "2Q",
+    decision: "Expand capacity",
     baseRevenue: 5.4,
     baseCost: 2.1,
     factor: { value: 1.04, risk: 1.12, impact: 1.18 },
     actions: [
-      ["Weeks 1-3", "Validate site-level demand, wait-time leakage, and staffing variance."],
-      ["Weeks 4-8", "Pilot schedule redesign in two clinics with clear escalation thresholds."],
-      ["Weeks 9-12", "Scale capacity where access, quality, and utilization indicators improve."],
+      ["Audit", "Demand and staffing variance"],
+      ["Pilot", "Two sites with guardrails"],
+      ["Scale", "Capacity where KPIs lift"],
     ],
   },
   retail: {
-    label: "Retail inventory",
+    label: "Retail",
     code: "RT-118",
-    owner: "VP Merchandising",
-    horizon: "Seasonal cycle",
-    exposure: "$3.2M margin swing",
-    brief:
-      "A retailer must decide how aggressively to stock seasonal products while protecting margin, availability, and working capital.",
-    decision: "Rebalance inventory toward high-confidence demand segments",
+    owner: "Merch",
+    horizon: "Season",
+    decision: "Rebalance inventory",
     baseRevenue: 4.6,
     baseCost: 1.8,
     factor: { value: 1.12, risk: 1.04, impact: 0.98 },
     actions: [
-      ["Weeks 1-3", "Segment SKUs by demand confidence, margin, and stockout penalty."],
-      ["Weeks 4-8", "Shift open-to-buy toward resilient segments and cap long-tail exposure."],
-      ["Weeks 9-12", "Review sell-through weekly and rebalance inventory before markdown risk rises."],
+      ["Segment", "SKUs by margin and demand"],
+      ["Shift", "Buy toward resilient lines"],
+      ["Tune", "Weekly sell-through response"],
     ],
   },
   education: {
-    label: "Student enrollment",
+    label: "Education",
     code: "ED-307",
-    owner: "Provost Office",
-    horizon: "Academic year",
-    exposure: "$6.1M tuition risk",
-    brief:
-      "A university wants to improve enrollment yield and persistence through advising, outreach, and scholarship allocation.",
-    decision: "Target advising and aid toward at-risk enrollment cohorts",
+    owner: "Provost",
+    horizon: "Year",
+    decision: "Target aid and advising",
     baseRevenue: 6.8,
     baseCost: 2.6,
     factor: { value: 0.96, risk: 0.92, impact: 1.2 },
     actions: [
-      ["Weeks 1-3", "Identify cohorts with the largest yield and persistence sensitivity."],
-      ["Weeks 4-8", "Launch advising interventions with measured student response signals."],
-      ["Weeks 9-12", "Redirect aid and staff effort toward cohorts with confirmed lift."],
+      ["Find", "Cohorts with yield risk"],
+      ["Launch", "Advising intervention"],
+      ["Redirect", "Aid toward measured lift"],
     ],
   },
   finance: {
-    label: "Fraud response",
+    label: "Finance",
     code: "FN-512",
-    owner: "Chief Risk Officer",
-    horizon: "90 days",
-    exposure: "$2.7M loss exposure",
-    brief:
-      "A financial services team must tune fraud controls across approval speed, loss prevention, false positives, and customer trust.",
-    decision: "Increase adaptive controls for medium-risk transactions",
+    owner: "CRO",
+    horizon: "90D",
+    decision: "Adaptive fraud controls",
     baseRevenue: 3.9,
     baseCost: 1.5,
     factor: { value: 1.08, risk: 1.2, impact: 0.94 },
     actions: [
-      ["Weeks 1-3", "Audit false positives, fraud loss clusters, and approval latency."],
-      ["Weeks 4-8", "Deploy adaptive controls to medium-risk bands with override monitoring."],
-      ["Weeks 9-12", "Tune thresholds using loss reduction and customer friction evidence."],
+      ["Audit", "Loss and false positives"],
+      ["Deploy", "Controls by risk band"],
+      ["Tune", "Thresholds by friction"],
     ],
   },
   supply: {
-    label: "Supply chain resilience",
+    label: "Supply Chain",
     code: "SC-276",
-    owner: "Head of Supply Chain",
-    horizon: "2 quarters",
-    exposure: "$7.4M disruption risk",
-    brief:
-      "An operations team must decide how much redundancy to fund across suppliers, inventory buffers, logistics, and service levels.",
-    decision: "Fund resilience buffers for the most fragile supply nodes",
+    owner: "Ops",
+    horizon: "2Q",
+    decision: "Fund resilience buffers",
     baseRevenue: 7.2,
     baseCost: 2.9,
     factor: { value: 1.01, risk: 1.08, impact: 1.1 },
     actions: [
-      ["Weeks 1-3", "Rank suppliers and lanes by revenue dependency and recovery time."],
-      ["Weeks 4-8", "Contract backup capacity for the most fragile high-value nodes."],
-      ["Weeks 9-12", "Stress-test service levels and tune buffer inventory by segment."],
+      ["Rank", "Nodes by recovery time"],
+      ["Secure", "Backup capacity"],
+      ["Stress", "Service level buffers"],
     ],
   },
 };
 
 const controls = ["budget", "demand", "operations", "risk"];
+const state = {
+  activeView: "drivers",
+  pulse: 0,
+  scores: null,
+  inputs: null,
+  scenario: null,
+  particles: [],
+};
 
 const elements = Object.fromEntries(
   [
+    "decisionCanvas",
     "scenarioSelect",
-    "scenarioBrief",
     "caseCode",
-    "decisionOwner",
-    "planningHorizon",
-    "baselineExposure",
     "valueScore",
     "riskScore",
     "impactScore",
@@ -114,18 +104,20 @@ const elements = Object.fromEntries(
     "decisionStage",
     "governanceLevel",
     "decisionBrief",
-    "decisionDot",
     "copyButton",
     "resetButton",
+    "simulateButton",
+    "optimizeButton",
+    "compareButton",
     "riskBadge",
-    "riskDrivers",
-    "sensitivityList",
-    "actionPlan",
-    "actionCadence",
+    "drawerTitle",
+    "drawerContent",
     ...controls,
     ...controls.map((name) => `${name}Value`),
   ].map((id) => [id, document.getElementById(id)]),
 );
+
+const ctx = elements.decisionCanvas.getContext("2d");
 
 function clamp(value, min = 0, max = 100) {
   return Math.max(min, Math.min(max, Math.round(value)));
@@ -165,55 +157,51 @@ function score(inputs, scenario) {
 function classify(scores) {
   if (scores.confidence >= 76 && scores.executionRisk <= 45) {
     return {
-      title: "Scale with executive sponsorship",
-      stage: "Scale decision",
-      governance: "Monthly steering review",
-      text:
-        "The upside is strong and execution risk is contained. Move beyond analysis, appoint a decision owner, and scale with explicit leading indicators.",
+      title: "Scale",
+      stage: "Go",
+      governance: "Monthly",
+      text: "Strong upside with contained delivery risk. Expand with leading indicators and a clear owner.",
     };
   }
   if (scores.value >= 66 && scores.executionRisk > 55) {
     return {
-      title: "Pilot with hard guardrails",
-      stage: "Controlled pilot",
-      governance: "Weekly risk review",
-      text:
-        "The opportunity is meaningful, but the model shows material delivery risk. Pilot in a narrow operating slice, cap downside exposure, and require evidence before expansion.",
+      title: "Pilot",
+      stage: "Guardrails",
+      governance: "Weekly",
+      text: "Good value, high uncertainty. Launch a narrow pilot and require evidence before scale.",
     };
   }
   if (scores.impact >= 70 && scores.confidence < 66) {
     return {
-      title: "Strengthen evidence before funding",
-      stage: "Evidence build",
-      governance: "Assumption review",
-      text:
-        "Stakeholder impact is high, but confidence is not yet strong enough for full commitment. Improve the evidence base around adoption, capacity, and constraints.",
+      title: "Validate",
+      stage: "Evidence",
+      governance: "Review",
+      text: "Impact is attractive, but confidence needs stronger data on adoption and capacity.",
     };
   }
   return {
-    title: "Hold, monitor, and refine",
-    stage: "Monitor",
-    governance: "Biweekly signal review",
-    text:
-      "The current assumptions do not justify a major move. Refine the decision objective, improve readiness, and watch the signals most likely to change the tradeoff.",
+    title: "Monitor",
+    stage: "Watch",
+    governance: "Biweekly",
+    text: "Hold the major commitment, improve readiness, and monitor the signal most likely to change the call.",
   };
 }
 
 function riskDrivers(inputs, scores) {
   return [
     {
-      label: "Demand volatility",
-      detail: "Pressure created by uncertain volume, timing, or adoption.",
+      label: "Demand",
+      detail: "Volume and timing pressure",
       value: clamp(inputs.demand * 0.72 + (100 - inputs.operations) * 0.28),
     },
     {
-      label: "Operating constraint",
-      detail: "Readiness gap across staffing, process, data quality, or execution capacity.",
+      label: "Readiness",
+      detail: "Process and capacity gap",
       value: clamp((100 - inputs.operations) * 0.82 + inputs.budget * 0.18),
     },
     {
-      label: "Downside exposure",
-      detail: "Risk accepted by leadership relative to the size of the commitment.",
+      label: "Exposure",
+      detail: "Accepted downside",
       value: clamp(inputs.risk * 0.68 + scores.executionRisk * 0.32),
     },
   ].sort((a, b) => b.value - a.value);
@@ -224,63 +212,74 @@ function sensitivity(inputs, scenario) {
   return controls
     .map((name) => {
       const changed = { ...inputs, [name]: clamp(inputs[name] + 10) };
-      return {
-        label:
-          name === "budget"
-            ? "Investment level"
-            : name === "demand"
-              ? "Demand pressure"
-              : name === "operations"
-                ? "Operational readiness"
-                : "Risk tolerance",
-        delta: score(changed, scenario).confidence - base,
+      const labels = {
+        budget: "Invest",
+        demand: "Demand",
+        operations: "Ready",
+        risk: "Risk",
       };
+      return { label: labels[name], detail: "+10 input move", value: score(changed, scenario).confidence - base };
     })
-    .sort((a, b) => Math.abs(b.delta) - Math.abs(a.delta));
+    .sort((a, b) => Math.abs(b.value) - Math.abs(a.value));
 }
 
-function renderRiskDrivers(drivers) {
-  elements.riskDrivers.innerHTML = drivers
-    .map(
-      (driver) => `
-        <div class="driver-item">
-          <strong>${driver.label}</strong>
-          <span class="driver-score">${driver.value}</span>
-          <small>${driver.detail}</small>
-        </div>
-      `,
-    )
-    .join("");
-}
-
-function renderSensitivity(items) {
-  const maxDelta = Math.max(...items.map((item) => Math.abs(item.delta)), 1);
-  elements.sensitivityList.innerHTML = items
+function renderRows(items, type = "bar") {
+  const max = Math.max(...items.map((item) => Math.abs(item.value)), 1);
+  return items
     .map((item) => {
-      const width = Math.max(8, (Math.abs(item.delta) / maxDelta) * 100);
-      const sign = item.delta >= 0 ? "+" : "";
+      const width = Math.max(8, (Math.abs(item.value) / max) * 100);
+      const value = item.value > 0 && type !== "bar" ? `+${item.value}` : item.value;
       return `
-        <div class="sensitivity-item">
-          <strong>${item.label}</strong>
-          <span>${sign}${item.delta} confidence pts</span>
-          <div class="bar-track"><div class="bar-fill" style="width: ${width}%"></div></div>
+        <div class="${type === "action" ? "action-row" : "data-row"}">
+          <span>${item.label}</span>
+          <small>${value}</small>
+          <small>${item.detail}</small>
+          ${type === "bar" ? `<div class="bar-track"><div class="bar-fill" style="width: ${width}%"></div></div>` : ""}
         </div>
       `;
     })
     .join("");
 }
 
-function renderActionPlan(scenario) {
-  elements.actionPlan.innerHTML = scenario.actions
-    .map(
-      ([period, text]) => `
-        <div class="action-item">
-          <strong>${period}</strong>
-          <p>${text}</p>
-        </div>
-      `,
-    )
-    .join("");
+function setDrawer() {
+  const { scenario, inputs, scores } = state;
+  const drivers = riskDrivers(inputs, scores);
+  const titles = {
+    drivers: "Risk Drivers",
+    sensitivity: "Sensitivity",
+    actions: "Actions",
+    brief: "Brief",
+  };
+
+  elements.drawerTitle.textContent = titles[state.activeView];
+
+  if (state.activeView === "drivers") {
+    elements.drawerContent.innerHTML = renderRows(drivers);
+  }
+  if (state.activeView === "sensitivity") {
+    elements.drawerContent.innerHTML = renderRows(sensitivity(inputs, scenario), "delta");
+  }
+  if (state.activeView === "actions") {
+    elements.drawerContent.innerHTML = renderRows(
+      scenario.actions.map(([label, detail], index) => ({ label, detail, value: index + 1 })),
+      "action",
+    );
+  }
+  if (state.activeView === "brief") {
+    elements.drawerContent.innerHTML = renderRows(
+      [
+        { label: scenario.decision, detail: scenario.owner, value: scenario.horizon },
+        { label: "Value", detail: currency(scores.netValue), value: `${scores.value}/100` },
+        { label: "Risk", detail: currency(scores.riskExposure), value: `${scores.executionRisk}/100` },
+      ],
+      "action",
+    );
+  }
+}
+
+function setActiveButton(button) {
+  document.querySelectorAll(".action-button").forEach((item) => item.classList.remove("active"));
+  button.classList.add("active");
 }
 
 function update() {
@@ -289,53 +288,40 @@ function update() {
   const scores = score(inputs, scenario);
   const recommendation = classify(scores);
   const drivers = riskDrivers(inputs, scores);
-  const sensitivityItems = sensitivity(inputs, scenario);
+
+  state.scenario = scenario;
+  state.inputs = inputs;
+  state.scores = scores;
+  state.pulse = 1;
 
   controls.forEach((name) => {
     elements[`${name}Value`].textContent = `${inputs[name]}%`;
   });
 
   elements.caseCode.textContent = scenario.code;
-  elements.scenarioBrief.textContent = scenario.brief;
-  elements.decisionOwner.textContent = scenario.owner;
-  elements.planningHorizon.textContent = scenario.horizon;
-  elements.baselineExposure.textContent = scenario.exposure;
-
   elements.valueScore.textContent = currency(scores.netValue);
-  elements.riskScore.textContent = `${scores.executionRisk}/100`;
+  elements.riskScore.textContent = `${scores.executionRisk}`;
   elements.impactScore.textContent = `${scores.serviceLift >= 0 ? "+" : ""}${scores.serviceLift}%`;
-  elements.confidenceScore.textContent = `${scores.confidence}/100`;
-  elements.valueDetail.textContent = `${scores.value}/100 opportunity score`;
-  elements.riskDetail.textContent = `${currency(scores.riskExposure)} estimated exposure`;
-  elements.impactDetail.textContent = `${scores.impact}/100 stakeholder score`;
-  elements.confidenceDetail.textContent = "Weighted confidence index";
-
+  elements.confidenceScore.textContent = `${scores.confidence}`;
+  elements.valueDetail.textContent = `${scores.value}/100`;
+  elements.riskDetail.textContent = currency(scores.riskExposure);
+  elements.impactDetail.textContent = `${scores.impact}/100`;
+  elements.confidenceDetail.textContent = scenario.owner;
   elements.recommendationTitle.textContent = recommendation.title;
   elements.recommendationText.textContent = recommendation.text;
   elements.decisionStage.textContent = recommendation.stage;
   elements.governanceLevel.textContent = recommendation.governance;
-
-  elements.decisionDot.style.left = `${clamp(scores.value, 8, 92)}%`;
-  elements.decisionDot.style.top = `${clamp(100 - scores.executionRisk, 8, 92)}%`;
-  elements.riskBadge.textContent = drivers[0].value >= 70 ? "Elevated" : drivers[0].value >= 50 ? "Moderate" : "Contained";
-  elements.actionCadence.textContent = scenario.horizon;
-
-  renderRiskDrivers(drivers);
-  renderSensitivity(sensitivityItems);
-  renderActionPlan(scenario);
+  elements.riskBadge.textContent = drivers[0].value >= 70 ? "High" : drivers[0].value >= 50 ? "Med" : "Low";
 
   elements.decisionBrief.textContent = [
-    `Scenario: ${scenario.label} (${scenario.code})`,
-    `Decision owner: ${scenario.owner}`,
-    `Strategic decision: ${scenario.decision}`,
-    `Planning horizon: ${scenario.horizon}`,
-    `Assumptions: investment ${inputs.budget}%, demand pressure ${inputs.demand}%, readiness ${inputs.operations}%, risk tolerance ${inputs.risk}%`,
-    `Projected impact: net value ${currency(scores.netValue)}, risk exposure ${currency(scores.riskExposure)}, service impact ${scores.serviceLift >= 0 ? "+" : ""}${scores.serviceLift}%, confidence ${scores.confidence}/100`,
-    `Recommendation: ${recommendation.title}`,
-    `Governance: ${recommendation.governance}`,
-    `Primary risk driver: ${drivers[0].label} (${drivers[0].value}/100)`,
-    `Rationale: ${recommendation.text}`,
+    `${scenario.label} ${scenario.code}`,
+    `Decision: ${scenario.decision}`,
+    `Value: ${currency(scores.netValue)} | Risk: ${currency(scores.riskExposure)} | Confidence: ${scores.confidence}/100`,
+    `Move: ${recommendation.title}`,
+    `Driver: ${drivers[0].label} ${drivers[0].value}/100`,
   ].join("\n");
+
+  setDrawer();
 }
 
 function reset() {
@@ -347,15 +333,138 @@ function reset() {
   update();
 }
 
+function optimize() {
+  elements.operations.value = clamp(Number(elements.operations.value) + 14);
+  elements.risk.value = clamp(Number(elements.risk.value) - 10);
+  elements.budget.value = clamp(Number(elements.budget.value) + 6);
+  update();
+}
+
+function compare() {
+  elements.demand.value = clamp(Number(elements.demand.value) + 10);
+  elements.risk.value = clamp(Number(elements.risk.value) + 8);
+  update();
+}
+
+function initParticles() {
+  state.particles = Array.from({ length: 90 }, (_, index) => {
+    const ring = index % 3;
+    return {
+      angle: (index / 90) * Math.PI * 2,
+      spin: 0.0025 + ring * 0.0012,
+      radius: 95 + ring * 58 + Math.random() * 18,
+      z: Math.random() * Math.PI * 2,
+      size: 1.5 + Math.random() * 2.4,
+    };
+  });
+}
+
+function resizeCanvas() {
+  const rect = elements.decisionCanvas.getBoundingClientRect();
+  const scale = window.devicePixelRatio || 1;
+  elements.decisionCanvas.width = Math.max(1, Math.floor(rect.width * scale));
+  elements.decisionCanvas.height = Math.max(1, Math.floor(rect.height * scale));
+  ctx.setTransform(scale, 0, 0, scale, 0, 0);
+}
+
+function drawScene(time = 0) {
+  const canvas = elements.decisionCanvas;
+  const width = canvas.clientWidth;
+  const height = canvas.clientHeight;
+  const centerX = width / 2;
+  const centerY = height / 2 + (width < 900 ? -30 : 20);
+  const scores = state.scores || score(getInputs(), scenarios[elements.scenarioSelect.value]);
+  const pulse = state.pulse;
+  state.pulse *= 0.94;
+
+  ctx.clearRect(0, 0, width, height);
+
+  const glow = ctx.createRadialGradient(centerX, centerY, 30, centerX, centerY, Math.min(width, height) * 0.52);
+  glow.addColorStop(0, "rgba(45, 212, 191, 0.26)");
+  glow.addColorStop(0.48, "rgba(125, 211, 252, 0.10)");
+  glow.addColorStop(1, "rgba(16, 24, 32, 0)");
+  ctx.fillStyle = glow;
+  ctx.fillRect(0, 0, width, height);
+
+  const sphereRadius = Math.min(width, height) * 0.2 + scores.confidence * 0.45 + pulse * 16;
+  ctx.save();
+  ctx.translate(centerX, centerY);
+  ctx.rotate(Math.sin(time / 2600) * 0.08);
+
+  for (let i = 0; i < 6; i += 1) {
+    ctx.beginPath();
+    ctx.ellipse(0, 0, sphereRadius + i * 11, (sphereRadius + i * 11) * (0.28 + i * 0.04), time / 1800 + i, 0, Math.PI * 2);
+    ctx.strokeStyle = `rgba(${i % 2 ? "125, 211, 252" : "45, 212, 191"}, ${0.24 - i * 0.025})`;
+    ctx.lineWidth = 1.25;
+    ctx.stroke();
+  }
+
+  state.particles.forEach((particle, index) => {
+    particle.angle += particle.spin + scores.value / 90000;
+    const depth = Math.sin(particle.angle + particle.z);
+    const x = Math.cos(particle.angle) * particle.radius;
+    const y = Math.sin(particle.angle + index * 0.08) * particle.radius * 0.42 + depth * 18;
+    const alpha = 0.35 + depth * 0.22;
+    ctx.beginPath();
+    ctx.arc(x, y, particle.size + depth * 0.7, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(183, 245, 223, ${Math.max(0.12, alpha)})`;
+    ctx.fill();
+  });
+
+  ctx.beginPath();
+  ctx.arc(0, 0, sphereRadius * 0.58, 0, Math.PI * 2);
+  const core = ctx.createRadialGradient(0, 0, 4, 0, 0, sphereRadius * 0.58);
+  core.addColorStop(0, "rgba(255, 255, 255, 0.92)");
+  core.addColorStop(0.24, "rgba(45, 212, 191, 0.62)");
+  core.addColorStop(1, "rgba(45, 212, 191, 0.06)");
+  ctx.fillStyle = core;
+  ctx.fill();
+  ctx.restore();
+
+  ctx.fillStyle = "rgba(237, 244, 242, 0.88)";
+  ctx.font = "800 13px Inter, system-ui, sans-serif";
+  ctx.textAlign = "center";
+  ctx.fillText(`${scores.confidence}/100 CONFIDENCE`, centerX, centerY + sphereRadius + 54);
+
+  requestAnimationFrame(drawScene);
+}
+
 controls.forEach((name) => elements[name].addEventListener("input", update));
 elements.scenarioSelect.addEventListener("change", update);
 elements.resetButton.addEventListener("click", reset);
+elements.optimizeButton.addEventListener("click", () => {
+  setActiveButton(elements.optimizeButton);
+  optimize();
+});
+elements.compareButton.addEventListener("click", () => {
+  setActiveButton(elements.compareButton);
+  compare();
+});
+elements.simulateButton.addEventListener("click", () => {
+  setActiveButton(elements.simulateButton);
+  update();
+});
 elements.copyButton.addEventListener("click", async () => {
+  setActiveButton(elements.copyButton);
   await navigator.clipboard.writeText(elements.decisionBrief.textContent);
   elements.copyButton.textContent = "Copied";
   setTimeout(() => {
-    elements.copyButton.textContent = "Copy brief";
+    elements.copyButton.textContent = "Brief";
   }, 1200);
 });
 
+document.querySelectorAll(".dock-button").forEach((button) => {
+  button.addEventListener("click", () => {
+    document.querySelectorAll(".dock-button").forEach((item) => item.classList.remove("selected"));
+    button.classList.add("selected");
+    state.activeView = button.dataset.view;
+    setDrawer();
+  });
+});
+
+window.addEventListener("resize", resizeCanvas);
+
+initParticles();
+resizeCanvas();
 update();
+requestAnimationFrame(drawScene);
