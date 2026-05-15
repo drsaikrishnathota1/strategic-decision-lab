@@ -28,7 +28,7 @@ for (const id of [
 
 assert(html.includes("Strategic Decision Lab"), "Expected app title");
 assert(css.includes("@media (max-width: 980px)"), "Expected responsive tablet layout");
-assert(css.includes("@media (max-width: 640px)"), "Expected responsive phone layout");
+assert(css.includes("@media (max-width: 680px)"), "Expected responsive phone layout");
 assert(js.includes("const scenarios"), "Expected scenario model");
 assert(js.includes("function score"), "Expected scoring function");
 assert(js.includes("function riskDrivers"), "Expected risk driver model");

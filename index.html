@@ -7,27 +7,36 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <main class="command-center">
-      <section class="stage" aria-label="Strategic Decision Lab cockpit">
-        <canvas id="decisionCanvas" aria-label="3D decision simulation view"></canvas>
+    <main class="site-shell">
+      <section class="hero">
+        <canvas id="decisionCanvas" aria-label="Animated decision intelligence scene"></canvas>
 
-        <header class="glass topbar">
-          <div>
-            <p class="eyebrow">Decision Intelligence</p>
-            <h1>Strategic Decision Lab</h1>
+        <nav class="nav glass">
+          <a class="brand" href="#">
+            <span class="brand-mark" aria-hidden="true"></span>
+            <span>DecisionLab</span>
+          </a>
+          <div class="nav-links" aria-label="Sections">
+            <a href="#cases">Cases</a>
+            <a href="#model">Model</a>
+            <a href="#brief">Brief</a>
           </div>
-          <div class="top-actions" aria-label="Primary actions">
-            <button id="simulateButton" class="action-button active" type="button">Run</button>
-            <button id="optimizeButton" class="action-button" type="button">Optimize</button>
-            <button id="compareButton" class="action-button" type="button">Compare</button>
-            <button id="copyButton" class="action-button" type="button">Brief</button>
-            <button id="resetButton" class="action-button muted-button" type="button">Reset</button>
-          </div>
-        </header>
+          <button id="copyButton" class="nav-action" type="button">Copy Brief</button>
+        </nav>
 
-        <aside class="glass control-rail">
-          <div class="rail-head">
-            <span id="caseCode" class="status-chip"></span>
+        <div class="hero-content">
+          <p class="eyebrow">Strategic Decision Intelligence</p>
+          <h1>Simulate the decision before you defend it.</h1>
+          <div class="hero-actions">
+            <button id="simulateButton" class="primary-action active" type="button">Run Simulation</button>
+            <button id="optimizeButton" class="primary-action" type="button">Optimize</button>
+            <button id="compareButton" class="primary-action" type="button">Stress Test</button>
+          </div>
+        </div>
+
+        <aside class="control-card glass" id="model">
+          <div class="card-head">
+            <span id="caseCode" class="chip"></span>
             <select id="scenarioSelect" aria-label="Business scenario">
               <option value="healthcare">Healthcare</option>
               <option value="retail">Retail</option>
@@ -37,26 +46,23 @@
             </select>
           </div>
 
-          <div class="control-grid">
-            <label class="control-tile" for="budget">
+          <div class="dial-grid">
+            <label class="dial" for="budget">
               <span>Invest</span>
               <strong id="budgetValue"></strong>
               <input id="budget" type="range" min="0" max="100" value="55" />
             </label>
-
-            <label class="control-tile" for="demand">
+            <label class="dial" for="demand">
               <span>Demand</span>
               <strong id="demandValue"></strong>
               <input id="demand" type="range" min="0" max="100" value="62" />
             </label>
-
-            <label class="control-tile" for="operations">
+            <label class="dial" for="operations">
               <span>Ready</span>
               <strong id="operationsValue"></strong>
               <input id="operations" type="range" min="0" max="100" value="58" />
             </label>
-
-            <label class="control-tile" for="risk">
+            <label class="dial" for="risk">
               <span>Risk</span>
               <strong id="riskValue"></strong>
               <input id="risk" type="range" min="0" max="100" value="48" />
@@ -64,7 +70,7 @@
           </div>
         </aside>
 
-        <section class="glass score-strip" aria-label="Decision metrics">
+        <section class="metric-strip glass" aria-label="Simulation metrics">
           <article>
             <span>Value</span>
             <strong id="valueScore"></strong>
@@ -86,31 +92,66 @@
             <small id="confidenceDetail"></small>
           </article>
         </section>
+      </section>
 
-        <section class="glass decision-card" aria-label="Recommendation">
-          <div class="decision-status">
+      <section class="content-band" id="cases">
+        <div class="section-title">
+          <p class="eyebrow">Live Decision Surface</p>
+          <h2 id="recommendationTitle"></h2>
+          <div class="stage-tags">
             <span id="decisionStage"></span>
             <span id="governanceLevel"></span>
+            <span id="riskBadge"></span>
           </div>
-          <h2 id="recommendationTitle"></h2>
-          <p id="recommendationText"></p>
-        </section>
+        </div>
+        <p id="recommendationText" class="recommendation-copy"></p>
 
-        <section class="glass insight-dock" aria-label="Decision tools">
-          <button class="dock-button selected" type="button" data-view="drivers">Drivers</button>
-          <button class="dock-button" type="button" data-view="sensitivity">Sensitivity</button>
-          <button class="dock-button" type="button" data-view="actions">Actions</button>
-          <button class="dock-button" type="button" data-view="brief">Brief</button>
-        </section>
+        <div class="tool-grid">
+          <button class="tool-card selected" type="button" data-view="drivers">
+            <span>01</span>
+            <strong>Drivers</strong>
+          </button>
+          <button class="tool-card" type="button" data-view="sensitivity">
+            <span>02</span>
+            <strong>Sensitivity</strong>
+          </button>
+          <button class="tool-card" type="button" data-view="actions">
+            <span>03</span>
+            <strong>Actions</strong>
+          </button>
+          <button class="tool-card" type="button" data-view="brief">
+            <span>04</span>
+            <strong>Brief</strong>
+          </button>
+        </div>
 
-        <section class="glass drawer" aria-live="polite">
-          <div class="drawer-head">
+        <section class="terminal glass">
+          <div class="terminal-top">
             <p id="drawerTitle" class="eyebrow"></p>
-            <span id="riskBadge" class="status-chip"></span>
+            <button id="resetButton" class="terminal-button" type="button">Reset Model</button>
           </div>
-          <div id="drawerContent" class="drawer-content"></div>
-          <pre id="decisionBrief" class="sr-brief"></pre>
+          <div id="drawerContent" class="terminal-grid"></div>
+          <pre id="decisionBrief" class="hidden-brief"></pre>
         </section>
+      </section>
+
+      <section class="proof-band">
+        <article>
+          <span>5</span>
+          <p>Strategic cases</p>
+        </article>
+        <article>
+          <span>4</span>
+          <p>Live assumptions</p>
+        </article>
+        <article>
+          <span>90D</span>
+          <p>Action horizon</p>
+        </article>
+        <article>
+          <span>1</span>
+          <p>Executive brief</p>
+        </article>
       </section>
     </main>
 

@@ -278,7 +278,7 @@ function setDrawer() {
 }
 
 function setActiveButton(button) {
-  document.querySelectorAll(".action-button").forEach((item) => item.classList.remove("active"));
+  document.querySelectorAll(".primary-action, .nav-action").forEach((item) => item.classList.remove("active"));
   button.classList.add("active");
 }
 
@@ -453,9 +453,9 @@ elements.copyButton.addEventListener("click", async () => {
   }, 1200);
 });
 
-document.querySelectorAll(".dock-button").forEach((button) => {
+document.querySelectorAll(".tool-card").forEach((button) => {
   button.addEventListener("click", () => {
-    document.querySelectorAll(".dock-button").forEach((item) => item.classList.remove("selected"));
+    document.querySelectorAll(".tool-card").forEach((item) => item.classList.remove("selected"));
     button.classList.add("selected");
     state.activeView = button.dataset.view;
     setDrawer();
